@@ -75,10 +75,12 @@ display(xsum_sample.to_pandas())
 # TODO
 
 # Constructor a summarization pipeline
-summarizer = <FILL_IN>
+summarizer = pipeline("summarization", model='it5/it5-base-news-summarization')
 
 # Apply the pipeline to the batch of articles in `xsum_sample`
-summarization_results = <FILL_IN>
+
+summarization_results = summarizer(xsum_sample["documents"])
+
 summarization_results
 
 # COMMAND ----------
@@ -138,9 +140,10 @@ display(jpn_sample.to_pandas())
 # TODO
 
 # Construct a pipeline for translating Japanese to English.
-translation_pipeline = <FILL_IN>
+translation_pipeline = pipeline('translation', model='staka/fugumt-ja-en')
 
 # Apply your pipeline on the sample of Japanese text in: jpn_sample["Japanese"]
+
 translation_results = translation_pipeline(jpn_sample["Japanese"])
 
 # COMMAND ----------
@@ -228,15 +231,15 @@ eos_token_id = few_shot_pipeline.tokenizer.encode("###")[0]
 # Fill in this template.
 
 prompt =\
-"""<High-level instruction about the task>:
+"""For each country suggest a the food they are known for:
 
-[<input_label>]: "<input text>"
-[<output_label>]: "<output_text>"
+[<input_label>]: "Romania"
+[<output_label>]: "Sarmale"
 ###
-[<input_label>]: "<input text>"
-[<output_label>]: "<output_text>"
+[<input_label>]: "India"
+[<output_label>]: "Biryani"
 ###
-[<input_label>]: "<input text>"
+[<input_label>]: "England"
 [<output_label>]:"""
 
 # COMMAND ----------
