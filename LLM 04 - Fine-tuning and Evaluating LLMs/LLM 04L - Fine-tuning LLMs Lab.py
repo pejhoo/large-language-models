@@ -91,7 +91,7 @@ from nltk.tokenize import sent_tokenize
 # COMMAND ----------
 
 # TODO
-ds = <FILL_IN>
+ds = "databricks/databricks-dolly-15k"
 
 # COMMAND ----------
 
@@ -111,7 +111,7 @@ dbTestQuestion4_1(ds)
 # COMMAND ----------
 
 # TODO
-model_checkpoint = <FILL_IN>
+model_checkpoint = "pythia-70m"
 
 # COMMAND ----------
 
@@ -132,7 +132,8 @@ dbTestQuestion4_2(model_checkpoint)
 
 # TODO
 # load the tokenizer that was used for the model
-tokenizer = <FILL_IN>
+tokenizer = tr.AutoTokenizer.from_pretrained(
+    model_checkpoint, cache_dir=DA.paths.datasets)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.add_special_tokens(
     {"additional_special_tokens": ["### End", "### Instruction:", "### Response:\n"]}
@@ -190,7 +191,7 @@ def tokenize(x: dict, max_length: int = 1024) -> dict:
 # COMMAND ----------
 
 # TODO
-tokenized_dataset = <FILL_IN>
+tokenized_dataset = tokenizer(remove_columns)
 
 # COMMAND ----------
 
@@ -216,7 +217,13 @@ dbTestQuestion4_4(tokenized_dataset)
 # TODO
 checkpoint_name = "test-trainer-lab"
 local_checkpoint_path = os.path.join(local_training_root, checkpoint_name)
-training_args = <FILL_IN>
+training_args = tr.TrainingArguments(
+    local_checkpoint_path,
+    num_train_epochs=10,  # default number of epochs to train is 3
+    per_device_train_batch_size=8,
+    optim="adamw_torch",
+    report_to=["tensorboard"],
+)
 
 # COMMAND ----------
 
@@ -238,7 +245,9 @@ dbTestQuestion4_5(training_args)
 
 # TODO
 # load the pre-trained model
-model = <FILL_IN>
+model = tr.AutoModelForSeq2SeqLM.from_pretrained(
+    model_checkpoint, cache_dir=DA.paths.datasets
+)
 
 # COMMAND ----------
 
@@ -264,8 +273,8 @@ SEED=42
 data_collator = DataCollatorForLanguageModeling(
     tokenizer=tokenizer, mlm=False, return_tensors="pt", pad_to_multiple_of=8
 )
-split_dataset = <FILL_IN>
-trainer = <FILL_IN>
+split_dataset = ds.train_test_split(test_size=0.2, shuffle=True)
+trainer = tr.Trainer(model, training_args, split_dataset, tokenizer, data_collator)
 
 # COMMAND ----------
 
@@ -302,7 +311,7 @@ tensorboard_display_dir = f"{local_checkpoint_path}/runs"
 
 # TODO
 # invoke training - note this will take approx. 30min
-<FILL_IN>
+trainer.train()
 
 # save model to the local checkpoint
 trainer.save_model()
@@ -431,7 +440,7 @@ def compute_rouge_score(generated, reference):
 # COMMAND ----------
 
 # TODO
-<FILL_IN>
+compute_rouge_score(generated, response)
 
 # COMMAND ----------
 
