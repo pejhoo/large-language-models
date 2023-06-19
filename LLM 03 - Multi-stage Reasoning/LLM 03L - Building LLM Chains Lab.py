@@ -192,12 +192,17 @@ all_shakespeare_text = loader.load()
 # COMMAND ----------
 
 # TODO
-text_splitter = <FILL_IN> #hint try chunk sizes of 1024 and an overlap of 256 (this will take approx. 10mins with this model to build our vector database index)
-texts = <FILL_IN>
+text_splitter = CharacterTextSplitter(chunk_size=1024, chunk_overlap=256)
+texts = text_splitter.split_documents(all_shakespeare_text) 
+#hint try chunk sizes of 1024 and an overlap of 256 (this will take approx. 10mins with this model to build our vector database index)
 
-model_name = <FILL_IN> #hint, try "sentence-transformers/all-MiniLM-L6-v2" as your model
-embeddings = <FILL_IN>
-docsearch = <FILL_IN>
+
+model_name = "sentence-transformers/all-MiniLM-L6-v2" #hint, try "sentence-transformers/all-MiniLM-L6-v2" as your model
+embeddings = HuggingFaceEmbeddings(
+    model_name=model_name, cache_folder=DA.paths.datasets)
+docsearch =  Chroma.from_documents(
+    texts, embeddings, persist_directory=DA.paths.working_dir
+)
 
 # COMMAND ----------
 
@@ -220,10 +225,10 @@ dbTestQuestion3_1(embeddings, docsearch)
 
 # TODO
 # Let's start with the simplest method: "Stuff" which puts all of the data into the prompt and asks a question of it:
-qa = RetrievalQA.from_chain_type(<FILL_IN>)
+qa = RetrievalQA.from_chain_type(llm=hf_llm, chain_type="stuff", retriever=retriever)
 query = "What happens in the play Hamlet?"
 # Run the query
-query_results_hamlet = <FILL_IN>
+query_results_hamlet = qa.run(query)
 
 query_results_hamlet
 
@@ -250,9 +255,9 @@ dbTestQuestion3_2(qa, query_results_hamlet)
 # COMMAND ----------
 
 # TODO
-qa = RetrievalQA.from_chain_type(llm=hf_llm, chain_type=<FILL_IN>, retriever=docsearch.as_retriever())
+qa = RetrievalQA.from_chain_type(llm=hf_llm, chain_type="map_reduce", retriever=docsearch.as_retriever())
 query = "Who is the main character in the Merchant of Venice?"
-query_results_venice = <FILL_IN>
+query_results_venice = qa.run(query)
 
 query_results_venice
 
@@ -273,9 +278,9 @@ dbTestQuestion3_3(qa, query_results_venice)
 # TODO
 # That's much better! Let's try another type
 
-qa = RetrievalQA.from_chain_type(llm=hf_llm, chain_type=<FILL_IN>, retriever=docsearch.as_retriever())
+qa = RetrievalQA.from_chain_type(llm=hf_llm, chain_type="refine", retriever=docsearch.as_retriever())
 query = "What happens to romeo and juliet?"
-query_results_romeo = <FILL_IN>
+query_results_romeo = qa.run(query)
 
 query_results_romeo
 
