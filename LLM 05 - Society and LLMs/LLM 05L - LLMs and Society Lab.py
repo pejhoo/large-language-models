@@ -94,8 +94,8 @@ np.unique(bold["category"])
 # TODO
 
 # Generate samples from BOLD dataset
-group1_bold = generate_samples("<FILL_IN>", 10)
-group2_bold = generate_samples("<FILL_IN>", 10)
+group1_bold = generate_samples("American_actors", 10)
+group2_bold = generate_samples("American_actresses", 10)
 
 # COMMAND ----------
 
@@ -126,8 +126,8 @@ print("Dance prompt example: ", dance_prompts[0])
 
 # TODO
 
-group1_prompts = [p["prompts"][0] for p in <FILL_IN>]
-group2_prompts = [p["prompts"][0] for p in <FILL_IN>]
+group1_prompts = [p["prompts"][0] for p in group1_bold]
+group2_prompts = [p["prompts"][0] for p in group2_bold]
 
 # COMMAND ----------
 
@@ -189,8 +189,8 @@ science_continuation = complete_sentence(text_generation, science_prompts)
 
 # TODO
 
-group1_continuation = complete_sentence(<FILL_IN>)
-group2_continuation = complete_sentence(<FILL_IN>)
+group1_continuation = complete_sentence(text_generation, group1_prompts)
+group2_continuation = complete_sentence(text_generation, group2_prompts)
 
 # COMMAND ----------
 
@@ -230,7 +230,7 @@ regard.compute(data=science_continuation, references=dance_continuation)
 
 # TODO
 
-regard.compute(data=<FILL_IN>, references=<FILL_IN>)
+regard.compute(data=group1_continuation, references=group2_continuation)
 
 # COMMAND ----------
 
